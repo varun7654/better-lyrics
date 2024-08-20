@@ -6,6 +6,10 @@ BetterLyrics.Lyrics = {
 
       BetterLyrics.Utils.log(BetterLyrics.Constants.FETCH_LYRICS_LOG, song, artist);
 
+      const urlParameters  = new URLSearchParams(window.location.search);
+      const videoId = urlParameters.get("v");
+
+      const url = `${BetterLyrics.Constants.LYRICS_API_URL}?s=${encodeURIComponent(BetterLyrics.Utils.unEntity(song))}&a=${encodeURIComponent(BetterLyrics.Utils.unEntity(artist))}&v=${encodeURIComponent(videoId)}`;
       const cacheKey = `blyrics_${song}_${artist}`;
 
       // Check for cached lyrics
@@ -145,8 +149,9 @@ BetterLyrics.Lyrics = {
 
       words.forEach((word, index) => {
         let span = document.createElement("span");
-        span.style.transitionDelay = `${index * 0.05}s`;
-        span.style.animationDelay = `${index * 0.05}s`;
+        let wordTiming = item.wordRelativeTimingsStart[index] / 1000;
+        span.style.transitionDelay = `${wordTiming}s`;
+        span.style.animationDelay = `${wordTiming}s`;
         span.textContent = words.length <= 1 ? word : word + " ";
         line.appendChild(span);
       });
