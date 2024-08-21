@@ -131,6 +131,7 @@ BetterLyrics.Lyrics = {
     lyrics.forEach(item => {
       let line = document.createElement("div");
       line.dataset.time = item.startTimeMs / 1000;
+      line.dataset.endTime = (item.startTimeMs + item.durationMs) / 1000;
       line.style = "--blyrics-duration: " + item.durationMs / 1000 + "s;";
 
       const words = item.words.split(" ");
@@ -245,8 +246,8 @@ BetterLyrics.Lyrics = {
             elem.setAttribute("data-scrolled", true);
             return true;
           } else if (currentTime > time && currentTime < parseFloat(lyrics[index + 1].getAttribute("data-time"))) {
-            const current = document.getElementsByClassName(BetterLyrics.Constants.CURRENT_LYRICS_CLASS)[0];
             elem.setAttribute("class", BetterLyrics.Constants.CURRENT_LYRICS_CLASS);
+            const current = elem;
             if (current !== undefined && current.getAttribute("data-scrolled") !== "true") {
               current.scrollIntoView({
                 behavior: "smooth",
@@ -258,7 +259,10 @@ BetterLyrics.Lyrics = {
             return true;
           } else {
             elem.setAttribute("data-scrolled", false);
-            elem.setAttribute("class", "");
+            if (currentTime >= parseFloat(lyrics[index].getAttribute("data-end-time")) + 1
+               || currentTime <= time) {
+              elem.setAttribute("class", "");
+            }
             return true;
           }
         });
