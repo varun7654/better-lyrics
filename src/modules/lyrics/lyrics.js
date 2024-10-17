@@ -134,7 +134,18 @@ BetterLyrics.Lyrics = {
       line.dataset.endTime = (item.startTimeMs + item.durationMs) / 1000;
       line.style = "--blyrics-duration: " + item.durationMs / 1000 + "s;";
 
-      const words = item.words.split(" ");
+      const wordsPart = item.words.split(" ");
+      const words = [];
+      wordsPart.forEach(word => {
+        splitByDash = word.split("-");
+        for (let i = 0; i < splitByDash.length; i++) {
+          if (i !== splitByDash.length - 1) {
+            words.push(splitByDash[i] + "-");
+          } else {
+            words.push(splitByDash[i]);
+          }
+        }
+      });
 
       if (!allZero) {
         line.setAttribute("data-scrolled", false);
@@ -150,7 +161,12 @@ BetterLyrics.Lyrics = {
 
       words.forEach((word, index) => {
         let span = document.createElement("span");
-        let wordTiming = item.wordRelativeTimingsStart[index] / 1000;
+        let wordTiming = 0;
+        if (index < item.wordRelativeTimingsStart.length){
+          wordTiming = item.wordRelativeTimingsStart[index] / 1000;
+        } else if (item.wordRelativeTimingsStart.length > 0) {
+          wordTiming = item.wordRelativeTimingsStart[item.wordRelativeTimingsStart.length - 1] / 1000;
+        }
         span.style.transitionDelay = `${wordTiming}s`;
         span.style.animationDelay = `${wordTiming}s`;
         span.textContent = words.length <= 1 ? word : word + " ";
