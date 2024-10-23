@@ -161,11 +161,13 @@ BetterLyrics.Lyrics = {
 
       words.forEach((word, index) => {
         let span = document.createElement("span");
-        let wordTiming = 0;
-        if (index < item.wordRelativeTimingsStart.length){
-          wordTiming = item.wordRelativeTimingsStart[index] / 1000;
-        } else if (item.wordRelativeTimingsStart.length > 0) {
-          wordTiming = item.wordRelativeTimingsStart[item.wordRelativeTimingsStart.length - 1] / 1000;
+        let wordTiming = index * 0.05;
+        if (item.wordRelativeTimingsStart) {
+          if (index < item.wordRelativeTimingsStart.length) {
+            wordTiming = item.wordRelativeTimingsStart[index] / 1000;
+          } else if (item.wordRelativeTimingsStart.length > 0) {
+            wordTiming = item.wordRelativeTimingsStart[item.wordRelativeTimingsStart.length - 1] / 1000;
+          }
         }
         span.style.transitionDelay = `${wordTiming}s`;
         span.style.animationDelay = `${wordTiming}s`;
