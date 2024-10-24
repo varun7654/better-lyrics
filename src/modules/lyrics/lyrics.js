@@ -9,7 +9,6 @@ BetterLyrics.Lyrics = {
       const urlParameters  = new URLSearchParams(window.location.search);
       const videoId = urlParameters.get("v");
 
-      const url = `${BetterLyrics.Constants.LYRICS_API_URL}?s=${encodeURIComponent(BetterLyrics.Utils.unEntity(song))}&a=${encodeURIComponent(BetterLyrics.Utils.unEntity(artist))}&v=${encodeURIComponent(videoId)}`;
       const cacheKey = `blyrics_${song}_${artist}`;
 
       // Check for cached lyrics
@@ -22,7 +21,7 @@ BetterLyrics.Lyrics = {
         }
 
         // Fetch lyrics from the primary API if not found in cache
-        const url = `${BetterLyrics.Constants.LYRICS_API_URL}?s=${encodeURIComponent(BetterLyrics.Utils.unEntity(song))}&a=${encodeURIComponent(BetterLyrics.Utils.unEntity(artist))}`;
+        const url = `${BetterLyrics.Constants.LYRICS_API_URL}?s=${encodeURIComponent(BetterLyrics.Utils.unEntity(song))}&a=${encodeURIComponent(BetterLyrics.Utils.unEntity(artist))}&v=${encodeURIComponent(videoId)}`;
 
         fetch(url)
           .then(response => {
@@ -233,6 +232,8 @@ BetterLyrics.Lyrics = {
       BetterLyrics.Utils.log(BetterLyrics.Constants.SYNC_DISABLED_LOG);
     }
   },
+
+
 
   setupLyricsCheckInterval: function () {
     BetterLyrics.App.lyricsCheckInterval = setInterval(function () {
