@@ -1,5 +1,62 @@
+let lyricsInjected = false;
+
+// Listen for messages from the injected script
+document.addEventListener("blyrics-send-player-time", function(event) {
+  if (!lyricsInjected) return;
+  let currentTime = event.detail.currentTime + 0.75;
+  const lyrics = [...document.getElementsByClassName(BetterLyrics.Constants.LYRICS_CLASS)[0].children];
+
+  lyrics.every((elem, index) => {
+    const time = parseFloat(elem.getAttribute("data-time"));
+
+    if (currentTime >= time && index + 1 === lyrics.length && elem.getAttribute("data-scrolled") !== "true") {
+      elem.setAttribute("class", BetterLyrics.Constants.CURRENT_LYRICS_CLASS);
+      elem.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      });
+      elem.setAttribute("data-scrolled", true);
+      return true;
+    } else if (currentTime > time - 0.1 && currentTime < parseFloat(lyrics[index + 1].getAttribute("data-time"))) {
+      elem.setAttribute("class", BetterLyrics.Constants.CURRENT_LYRICS_CLASS);
+      const current = elem;
+      if (current !== undefined && current.getAttribute("data-scrolled") !== "true") {
+        current.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+          inline: "center",
+        });
+        let offset = currentTime - time;
+        let wordElems = current.getElementsByClassName("words");
+        console.log(wordElems);
+        let minDelay = 0.00;
+        for (let wordElem of wordElems) {
+          minDelay += 0.005;
+          let trueDelay = wordElem.dataset.trueDelay;
+          let adjustedDelay = Math.max(minDelay, trueDelay - offset);
+          wordElem.style.animationDelay = adjustedDelay + "s"
+          wordElem.style.transitionDelay = adjustedDelay + "s"
+        }
+        current.setAttribute("data-scrolled", true);
+        console.log("scrolled", offset);
+      }
+      return true;
+    } else {
+      elem.setAttribute("data-scrolled", false);
+      if (currentTime >= parseFloat(lyrics[index].getAttribute("data-end-time")) + 1
+          || currentTime <= time) {
+        elem.setAttribute("class", "");
+      }
+      return true;
+    }
+  });
+
+});
+
 BetterLyrics.Lyrics = {
   createLyrics: function () {
+    lyricsInjected = false;
     BetterLyrics.DOM.requestSongInfo(e => {
       const song = e.song;
       const artist = e.artist;
@@ -160,6 +217,7 @@ BetterLyrics.Lyrics = {
 
       words.forEach((word, index) => {
         let span = document.createElement("span");
+        span.className = "words"
         let wordTiming = index * 0.05;
         if (item.wordRelativeTimingsStart) {
           if (index < item.wordRelativeTimingsStart.length) {
@@ -168,6 +226,9 @@ BetterLyrics.Lyrics = {
             wordTiming = item.wordRelativeTimingsStart[item.wordRelativeTimingsStart.length - 1] / 1000;
           }
         }
+
+        span.dataset.trueDelay = wordTiming;
+
         span.style.transitionDelay = `${wordTiming}s`;
         span.style.animationDelay = `${wordTiming}s`;
         span.textContent = words.length <= 1 ? word : word + " ";
@@ -236,60 +297,7 @@ BetterLyrics.Lyrics = {
 
 
   setupLyricsCheckInterval: function () {
-    BetterLyrics.App.lyricsCheckInterval = setInterval(function () {
-      if (BetterLyrics.DOM.isLoaderActive()) {
-        BetterLyrics.Utils.log(BetterLyrics.Constants.LOADER_ACTIVE_LOG);
-        return;
-      }
-      try {
-        let currentTime =
-          BetterLyrics.Utils.timeToInt(
-            document
-              .getElementsByClassName(BetterLyrics.Constants.TIME_INFO_CLASS)[0]
-              .innerHTML.replaceAll(" ", "")
-              .replaceAll("\n", "")
-              .split("/")[0]
-          ) + 0.75;
-        const lyrics = [...document.getElementsByClassName(BetterLyrics.Constants.LYRICS_CLASS)[0].children];
-
-        lyrics.every((elem, index) => {
-          const time = parseFloat(elem.getAttribute("data-time"));
-
-          if (currentTime >= time && index + 1 === lyrics.length && elem.getAttribute("data-scrolled") !== "true") {
-            elem.setAttribute("class", BetterLyrics.Constants.CURRENT_LYRICS_CLASS);
-            elem.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-              inline: "center",
-            });
-            elem.setAttribute("data-scrolled", true);
-            return true;
-          } else if (currentTime > time && currentTime < parseFloat(lyrics[index + 1].getAttribute("data-time"))) {
-            elem.setAttribute("class", BetterLyrics.Constants.CURRENT_LYRICS_CLASS);
-            const current = elem;
-            if (current !== undefined && current.getAttribute("data-scrolled") !== "true") {
-              current.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-                inline: "center",
-              });
-              current.setAttribute("data-scrolled", true);
-            }
-            return true;
-          } else {
-            elem.setAttribute("data-scrolled", false);
-            if (currentTime >= parseFloat(lyrics[index].getAttribute("data-end-time")) + 1
-               || currentTime <= time) {
-              elem.setAttribute("class", "");
-            }
-            return true;
-          }
-        });
-      } catch (err) {
-        BetterLyrics.Utils.log(err);
-        return true;
-      }
-    }, 50);
+    lyricsInjected = true;
   },
   parseLRCLIBLyrics: function (syncedLyrics, duration) {
     const lines = syncedLyrics.split("\n");
