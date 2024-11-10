@@ -35,7 +35,7 @@ BetterLyrics.App = {
     } else {
       BetterLyrics.App.lyricInjectionPromise = BetterLyrics.Lyrics.createLyrics(song, artist, videoId)
         .then(() => BetterLyrics.DOM.tickLyrics(currentTime))
-        .then(() => console.log(BetterLyrics.Constants.FINISHED_INJECTING));
+        .then(() => BetterLyrics.Utils.log(BetterLyrics.Constants.FINISHED_INJECTING));
     }
   },
 
@@ -59,7 +59,7 @@ BetterLyrics.App = {
           ) {
             try {
               if (currentVideoId === BetterLyrics.App.lastVideoId && BetterLyrics.App.areLyricsTicking) {
-                console.log(BetterLyrics.Constants.SKIPPING_LOAD_WITH_META);
+                BetterLyrics.Utils.log(BetterLyrics.Constants.SKIPPING_LOAD_WITH_META);
                 return; // We already loaded this video
               }
             } finally {
@@ -68,7 +68,7 @@ BetterLyrics.App = {
             }
 
             if (!detail.song || !detail.artist) {
-              console.log(BetterLyrics.Constants.LOADING_WITHOUT_SONG_META);
+              BetterLyrics.Utils.log(BetterLyrics.Constants.LOADING_WITHOUT_SONG_META);
             }
 
             BetterLyrics.Utils.log(BetterLyrics.Constants.SONG_SWITCHED_LOG, detail.videoId);
