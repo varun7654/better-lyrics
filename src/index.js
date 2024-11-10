@@ -35,7 +35,7 @@ BetterLyrics.App = {
     } else {
       BetterLyrics.App.lyricInjectionPromise = BetterLyrics.Lyrics.createLyrics(song, artist, videoId)
         .then(() => BetterLyrics.DOM.tickLyrics(currentTime))
-        .then(() => console.log("finished loading"));
+        .then(() => console.log(BetterLyrics.Constants.FINISHED_INJECTING));
     }
   },
 
