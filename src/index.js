@@ -28,7 +28,7 @@ BetterLyrics.App = {
   handleModifications: function (song, artist, currentTime, videoId) {
     if (BetterLyrics.App.lyricInjectionPromise) {
       BetterLyrics.App.lyricInjectionPromise.then(() => {
-        // wait until the prev request finishes, then reru
+        // wait until the prev request finishes, then rerun
         BetterLyrics.App.lyricInjectionPromise = null;
         BetterLyrics.App.handleModifications(song, artist, currentTime, videoId);
       });
