@@ -1,11 +1,5 @@
 BetterLyrics.Utils = {
-  log: function (...message) {
-    BetterLyrics.Storage.getStorage({ isLogsEnabled: true }, items => {
-      if (items.isLogsEnabled) {
-        console.log(...message);
-      }
-    });
-  },
+  log: console.log.bind(window.console),
 
   timeToInt: function (time) {
     time = time.split(":");

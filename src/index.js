@@ -44,6 +44,12 @@ BetterLyrics.App = {
   },
 
   init: function () {
+    BetterLyrics.Storage.getStorage({ isLogsEnabled: true }, items => {
+      if (!items.isLogsEnabled) {
+        BetterLyrics.Utils.log = function(){};
+      }
+    });
+
     try {
       if (document.readyState !== "loading") {
         BetterLyrics.App.modify();
